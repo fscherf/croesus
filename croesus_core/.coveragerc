@@ -1,0 +1,4 @@
+[run]
+branch = True
+data_file = croesus_core/.coverage
+omit = */croesus_core/migrations/*
