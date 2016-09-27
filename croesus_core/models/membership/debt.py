@@ -1,6 +1,6 @@
 from collections import Iterable
 
-from django.db.models import BooleanField, FloatField, Case, When, Sum, F
+from django.db.models import BooleanField, Case, When, Sum, F
 from django.db import transaction
 from django.apps import apps
 from django.db import models
@@ -24,14 +24,10 @@ class MembershipFeeDebtManager(models.Manager):
             self.model,
             using=self._db,
         ).annotate(
-            bookings_amount=Case(
-                When(bookings__amount__isnull=False,
-                     then=Sum('bookings__amount')),
-                output_field=FloatField(),
-                default=0.0,
-            ),
+            bookings_amount=Sum('bookings__amount'),
         ).annotate(
             unpaid=Case(
+                When(bookings_amount__isnull=True, then=True),
                 When(bookings_amount__lt=F('fee'), then=True),
                 output_field=BooleanField(),
                 default=False,

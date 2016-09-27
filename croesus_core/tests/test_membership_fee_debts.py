@@ -86,11 +86,13 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         # test unpaid on empty bookings
         self.assertEqual(
-            MembershipFeeDebt.objects.first().bookings_amount, 0)
+            MembershipFeeDebt.objects.count(), 1)
+
+        self.assertEqual(
+            MembershipFeeDebt.objects.first().bookings_amount, None)
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=True,
             ).count(),
             1,
@@ -98,7 +100,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=False,
             ).count(),
             0,
@@ -106,7 +107,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=True,
             ).count(),
             0,
@@ -114,7 +114,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=False,
             ).count(),
             1,
@@ -122,7 +121,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=True,
             ).count(),
             0,
@@ -130,7 +128,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=False,
             ).count(),
             1,
@@ -141,11 +138,13 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
         debt.save()
 
         self.assertEqual(
+            MembershipFeeDebt.objects.count(), 1)
+
+        self.assertEqual(
             MembershipFeeDebt.objects.first().bookings_amount, 10.0)
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=True,
             ).count(),
             1,
@@ -153,7 +152,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=False,
             ).count(),
             0,
@@ -161,7 +159,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=True,
             ).count(),
             0,
@@ -169,7 +166,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=False,
             ).count(),
             1,
@@ -177,7 +173,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=True,
             ).count(),
             0,
@@ -185,7 +180,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=False,
             ).count(),
             1,
@@ -196,11 +190,13 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
         debt.save()
 
         self.assertEqual(
+            MembershipFeeDebt.objects.count(), 1)
+
+        self.assertEqual(
             MembershipFeeDebt.objects.first().bookings_amount, 20.0)
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=True,
             ).count(),
             0,
@@ -208,7 +204,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=False,
             ).count(),
             1,
@@ -216,7 +211,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=True,
             ).count(),
             1,
@@ -224,7 +218,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=False,
             ).count(),
             0,
@@ -232,7 +225,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=True,
             ).count(),
             0,
@@ -240,22 +232,24 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=False,
             ).count(),
             1,
         )
 
         # test overpaid
-        debt.bookings.add(turnover.book(account, 10.0))
+        debt.bookings.add(turnover.book(account, 5.50))
+        debt.bookings.add(turnover.book(account, 4.50))
         debt.save()
+
+        self.assertEqual(
+            MembershipFeeDebt.objects.count(), 1)
 
         self.assertEqual(
             MembershipFeeDebt.objects.first().bookings_amount, 30.0)
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=True,
             ).count(),
             0,
@@ -263,7 +257,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 unpaid=False,
             ).count(),
             1,
@@ -271,7 +264,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=True,
             ).count(),
             1,
@@ -279,7 +271,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 paid=False,
             ).count(),
             0,
@@ -287,7 +278,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=True,
             ).count(),
             1,
@@ -295,7 +285,6 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         self.assertEqual(
             MembershipFeeDebt.objects.filter(
-                pk=debt.pk,
                 overpaid=False,
             ).count(),
             0,
