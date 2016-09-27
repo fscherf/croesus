@@ -59,11 +59,13 @@ class BookingTestCase(TestCase):
 
         # test underbooked on empty bookings
         self.assertEqual(
-            HibiscusTurnover.objects.first().bookings_amount, 0)
+            HibiscusTurnover.objects.count(), 1)
+
+        self.assertEqual(
+            HibiscusTurnover.objects.first().bookings_amount, None)
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=True,
             ).count(),
             1,
@@ -71,7 +73,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=False,
             ).count(),
             0,
@@ -79,7 +80,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=True,
             ).count(),
             0,
@@ -87,7 +87,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=False,
             ).count(),
             1,
@@ -95,7 +94,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=True,
             ).count(),
             0,
@@ -103,21 +101,22 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=False,
             ).count(),
             1,
         )
 
         # test underbooked
-        turnover.book(account, 10.0)
+        turnover.book(account, 5.0)
 
         self.assertEqual(
-            HibiscusTurnover.objects.first().bookings_amount, 10.0)
+            HibiscusTurnover.objects.count(), 1)
+
+        self.assertEqual(
+            HibiscusTurnover.objects.first().bookings_amount, 5.0)
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=True,
             ).count(),
             1,
@@ -125,7 +124,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=False,
             ).count(),
             0,
@@ -133,7 +131,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=True,
             ).count(),
             0,
@@ -141,7 +138,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=False,
             ).count(),
             1,
@@ -149,7 +145,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=True,
             ).count(),
             0,
@@ -157,21 +152,22 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=False,
             ).count(),
             1,
         )
 
         # test booked
-        turnover.book(account, 10.0)
+        turnover.book(account, 15.0)
+
+        self.assertEqual(
+            HibiscusTurnover.objects.count(), 1)
 
         self.assertEqual(
             HibiscusTurnover.objects.first().bookings_amount, 20.0)
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=True,
             ).count(),
             0,
@@ -179,7 +175,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=False,
             ).count(),
             1,
@@ -187,7 +182,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=True,
             ).count(),
             1,
@@ -195,7 +189,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=False,
             ).count(),
             0,
@@ -203,7 +196,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=True,
             ).count(),
             0,
@@ -211,21 +203,23 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=False,
             ).count(),
             1,
         )
 
         # test overbooked
-        turnover.book(account, 10.0)
+        turnover.book(account, 6.50)
+        turnover.book(account, 3.50)
+
+        self.assertEqual(
+            HibiscusTurnover.objects.count(), 1)
 
         self.assertEqual(
             HibiscusTurnover.objects.first().bookings_amount, 30.0)
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=True,
             ).count(),
             0,
@@ -233,7 +227,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 underbooked=False,
             ).count(),
             1,
@@ -241,7 +234,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=True,
             ).count(),
             1,
@@ -249,7 +241,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 booked=False,
             ).count(),
             0,
@@ -257,7 +248,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=True,
             ).count(),
             1,
@@ -265,7 +255,6 @@ class BookingTestCase(TestCase):
 
         self.assertEqual(
             HibiscusTurnover.objects.filter(
-                pk=turnover.pk,
                 overbooked=False,
             ).count(),
             0,
