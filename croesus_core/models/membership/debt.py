@@ -79,7 +79,7 @@ class MembershipFeeDebtManager(models.Manager):
                     else:
                         debt = debts.first()
 
-                        debt.first().fee = agreement.fee
+                        debt.fee = agreement.fee
                         debt.save()
 
 
@@ -96,6 +96,9 @@ class MembershipFeeDebt(models.Model):
     bookings = models.ManyToManyField('croesus_core.Booking')
 
     comment = models.TextField(blank=True, null=True, verbose_name='Comment')
+
+    def __str__(self):
+        return '<MembershipFeeDebt {}, {}, {}>'.format(self.person, self.period, self.fee)  # NOQA
 
     class Meta:
         app_label = 'croesus_core'

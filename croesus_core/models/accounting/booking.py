@@ -23,3 +23,7 @@ class Booking(models.Model):
     class Meta:
         app_label = 'croesus_core'
         ordering = ['date']
+
+    def __str__(self):
+        return '<Booking:{}, {}, {}>'.format(self.pk, self.amount,
+                                             self.account)

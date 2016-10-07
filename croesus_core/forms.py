@@ -30,15 +30,15 @@ class MembershipFeeAgreementForm(forms.ModelForm):
     fee = forms.FloatField(initial=20)
 
     def __init__(self, *args, **kwargs):
-        Person = apps.get_model('croesus.Person')
+        Person = apps.get_model('croesus_core.Person')
 
         super(MembershipFeeAgreementForm, self).__init__(*args, **kwargs)
-        self.fields['person'].queryset = Person.objects.members()
+        self.fields['person'].queryset = Person.objects.filter(member=True)
 
 
 class MembershipFeeDebtForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        Person = apps.get_model('croesus.Person')
+        Person = apps.get_model('croesus_core.Person')
 
         super(MembershipFeeDebtForm, self).__init__(*args, **kwargs)
-        self.fields['person'].queryset = Person.objects.members()
+        self.fields['person'].queryset = Person.objects.filter(member=True)

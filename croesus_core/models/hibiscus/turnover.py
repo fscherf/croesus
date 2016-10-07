@@ -97,6 +97,14 @@ class HibiscusTurnover(models.Model):
             self.person = pa[0].person
             self.save()
 
+    def __str__(self):
+        return '<HibiscusTurnover:{}, {}, {}, {}>'.format(
+                self.pk,
+                self.person,
+                self.date,
+                self.amount
+        )
+
     class Meta:
         app_label = 'croesus_core'
         unique_together = ('account_id', 'turnover_id', )
