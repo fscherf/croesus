@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, pre_delete
 from django.dispatch import receiver
 
 from .accounting import *  # NOQA
@@ -20,3 +20,8 @@ def compact_ibans(sender, instance, **kwargs):
 
         if not valid:
             raise ValueError(message)
+
+
+@receiver(pre_delete, sender=MembershipFeeDebt)  # NOQA
+def delete_orphaned_bookings(sender, instance, **kwargs):
+    instance.bookings.all().delete()
