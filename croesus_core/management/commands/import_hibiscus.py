@@ -1,4 +1,6 @@
 from django.core.management.base import BaseCommand
+from django.db import transaction
+
 from ...utils.hibiscus import HibiscusProxy
 from ...models import HibiscusTurnover
 
@@ -9,6 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('--port', '-P', default=18080)
         parser.add_argument('--no-verify', action='store_true', default=False)
 
+    @transaction.atomic
     def handle(self, *args, **options):
         proxy = HibiscusProxy('admin', 'hibiscus', host=options['host'],
                               port=options['port'],
