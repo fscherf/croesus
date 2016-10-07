@@ -1,0 +1,4 @@
+Developing
+==========
+
+.. include:: ./developing.rst
