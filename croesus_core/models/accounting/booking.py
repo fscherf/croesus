@@ -8,7 +8,11 @@ __all__ = [
 class Booking(models.Model):
     amount = models.FloatField(verbose_name='Amount')
     date = models.DateTimeField(auto_now_add=True)
-    account = models.ForeignKey('croesus_core.Account')
+
+    account = models.ForeignKey(
+        'croesus_core.Account',
+        on_delete=models.PROTECT,
+    )
 
     turnover = models.ForeignKey(
         'croesus_core.HibiscusTurnover',

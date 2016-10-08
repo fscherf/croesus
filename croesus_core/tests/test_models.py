@@ -55,6 +55,26 @@ class ModelTestCase(TestCase):
         t2.bookings.all().delete()
         t2.delete()
 
+    def test_account_delete(self):
+        from django.db.models import ProtectedError
+
+        from croesus_core.models import Account, Booking
+
+        # account without bookings
+        a1 = Account.objects.create(name='a1')
+
+        a1.delete()
+
+        # account without bookings
+        a2 = Account.objects.create(name='a2')
+        booking = Booking.objects.create(account=a2, amount=10.0)
+
+        with self.assertRaises(ProtectedError):
+            a2.delete()
+
+        booking.delete()
+        a2.delete()
+
     def test_person_types(self):
         from croesus_core.models import Person
 
