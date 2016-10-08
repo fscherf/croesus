@@ -57,6 +57,8 @@ class MembershipFeeDebtManager(models.Manager):
         if not isinstance(periods, Iterable):
             periods = [periods]
 
+        debt_pks = []
+
         for person in persons:
             for period in periods:
                 agreement = person.get_membership_fee_agreement(period)
@@ -69,18 +71,16 @@ class MembershipFeeDebtManager(models.Manager):
                                                               period=period)
 
                     if not debts.exists():
-                        self.create(
+                        debt = self.create(
                             person=person,
                             period=period,
                             agreement=agreement,
                             fee=agreement.fee,
                         )
 
-                    else:
-                        debt = debts.first()
+                        debt_pks.append(debt.pk)
 
-                        debt.fee = agreement.fee
-                        debt.save()
+        return self.filter(pk__in=debt_pks)
 
 
 class MembershipFeeDebt(models.Model):
