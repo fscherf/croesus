@@ -12,16 +12,9 @@ __all__ = [
 ]
 
 
-class PersonQuerySet(models.QuerySet):
-    pass
-
-
 class PersonManager(models.Manager):
     def get_queryset(self):
-        return PersonQuerySet(
-            self.model,
-            using=self._db,
-        ).annotate(
+        return super(PersonManager, self).get_queryset().annotate(
             member=Case(
                 When(type=Person.MEMBER, then=True),
                 output_field=BooleanField(),
@@ -70,9 +63,8 @@ class Person(models.Model):
 
         # check for inactive rules
         inactive_rules = self.personinactiverule_set.filter(
-            start__lte=period
-        ).filter(
-            Q(end__isnull=True) | Q(end__gt=period)
+            Q(end__isnull=True) | Q(end__gt=period),
+            start__lte=period,
         )
 
         if inactive_rules.exists():
@@ -80,9 +72,8 @@ class Person(models.Model):
 
         # agreement
         agreements = self.membershipfeeagreement_set.filter(
-            start__lte=period
-        ).filter(
-            Q(end__isnull=True) | Q(end__gt=period)
+            Q(end__isnull=True) | Q(end__gt=period),
+            start__lte=period,
         )
 
         if agreements.count() < 1:
