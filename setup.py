@@ -2,20 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
-import os
 
-if os.environ.get('TOX', False):
-    packages = find_packages(exclude=['tests'])
-    install_requires = []
-
-else:
-    packages = find_packages(exclude=('tests', '*.test_project',))
-
-    install_requires = [
-        'Django>=1.8,<=1.9',
-        'python-dateutil',
-        'PTable',
-    ]
 
 setup(
     name='croesus',
@@ -25,7 +12,11 @@ setup(
     author='Florian Scherf',
     author_email='f.scherf@pengutronix.de',
     license='BSD',
-    packages=packages,
+    packages=find_packages(exclude=('tests', 'test_project',)),
     zip_safe=True,
-    install_requires=install_requires,
+    install_requires=[
+        'Django>=1.8,<=1.9',
+        'python-dateutil',
+        'PTable',
+    ],
 )
