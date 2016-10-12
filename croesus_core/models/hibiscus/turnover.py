@@ -1,4 +1,4 @@
-from django.db.models import BooleanField, Case, When, Sum, F
+from django.db.models import BooleanField, FloatField, Case, When, Sum, F
 from django.apps import apps
 from django.db import models
 
@@ -36,6 +36,12 @@ class HibiscusTurnoverManager(models.Manager):
                 When(bookings_amount__gt=F('amount'), then=True),
                 output_field=BooleanField(),
                 default=False,
+            ),
+            bookable=Case(
+                When(bookings_amount__isnull=False,
+                     then=F('amount') - F('bookings_amount')),
+                output_field=FloatField(),
+                default=F('amount'),
             ),
         )
 
