@@ -15,7 +15,7 @@ setup(
     packages=find_packages(exclude=('tests', 'test_project',)),
     zip_safe=True,
     install_requires=[
-        'Django>=1.8,<=1.9',
+        'Django>=1.8,<1.9',
         'python-dateutil',
         'PTable',
     ],
