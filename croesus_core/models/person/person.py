@@ -34,6 +34,14 @@ class PersonQuerySet(CroesusQueryset):
 
             person.dump(buffer)
 
+    def active(self, period):
+        return self.filter(pk__in=[i.pk for i in self.iterator()
+                                   if i.active(period)])
+
+    def inactive(self, period):
+        return self.filter(pk__in=[i.pk for i in self.iterator()
+                                   if i.inactive(period)])
+
 
 class PersonManager(models.Manager):
     def get_queryset(self):
@@ -82,18 +90,33 @@ class Person(models.Model):
         if not self.email_address:
             self.email_address = None
 
-    def get_membership_fee_agreement(self, period):
-        # only members can pay membership fees
-        if self.type != self.MEMBER:
-            return None
-
-        # check for inactive rules
+    def get_person_inactive_rule(self, period):
         inactive_rules = self.personinactiverule_set.filter(
             Q(end__isnull=True) | Q(end__gt=period),
             start__lte=period,
         )
 
         if inactive_rules.exists():
+            return inactive_rules
+
+        return None
+
+    def inactive(self, period):
+        if period < self.accession:
+            return True
+
+        return bool(self.get_person_inactive_rule(period))
+
+    def active(self, period):
+        return not self.inactive(period)
+
+    def get_membership_fee_agreement(self, period):
+        # only members can pay membership fees
+        if self.type != self.MEMBER:
+            return None
+
+        # check if inactive
+        if self.inactive(period):
             return None
 
         # agreement
