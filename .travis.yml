@@ -1,6 +1,15 @@
 language: python
-python: 3.4
+
+matrix:
+ include:
+  - python: 3.4
+    env: TOXENV=py34-core
+
+  - python: 3.5
+    env: TOXENV=py35-core
+
 install:
  - pip install tox
+
 script:
  - tox
