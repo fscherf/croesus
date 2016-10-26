@@ -3,6 +3,8 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Case, When, Q, BooleanField
 from django.db import models
 
+from ...utils.serializers import PrettyYamlSerializer
+
 from ...exceptions.membership_fee_agreement import (
     MultipleMembershipFeeAgreementsError,
 )
@@ -12,9 +14,21 @@ __all__ = [
 ]
 
 
+class PersonQuerySet(models.QuerySet):
+    def dump(self, buffer):
+        for index, person in enumerate(self.order_by('surname', 'name')):
+            if index > 0:
+                buffer.write('\n')
+
+            person.dump(buffer)
+
+
 class PersonManager(models.Manager):
     def get_queryset(self):
-        return super(PersonManager, self).get_queryset().annotate(
+        return PersonQuerySet(
+            self.model,
+            using=self._db,
+        ).annotate(
             member=Case(
                 When(type=Person.MEMBER, then=True),
                 output_field=BooleanField(),
@@ -92,6 +106,50 @@ class Person(models.Model):
             return agreement
 
         return None
+
+    def dump(self, buffer):
+        def write_title(title, line_length=80):
+            buffer.write('# {} {}\n'.format(
+                title,
+                '#' * (line_length - len(title) - 4)))
+
+        serializer = PrettyYamlSerializer()
+
+        # Person
+        write_title(str(self))
+        serializer.serialize([self], stream=buffer)
+        buffer.write('\n')
+
+        # PersonAccounts
+        if self.personaccount_set.count() > 0:
+            write_title('PersonAccounts', line_length=60)
+
+            serializer.serialize(
+                self.personaccount_set.all().order_by('iban'), stream=buffer)
+
+            buffer.write('\n')
+
+        # MembershipFeeAgreements
+        if self.membershipfeeagreement_set.count() > 0:
+            write_title('MembershipFeeAgreements', line_length=60)
+
+            serializer.serialize(
+                self.membershipfeeagreement_set.all().order_by('start'),
+                stream=buffer,
+            )
+
+            buffer.write('\n')
+
+        # InactiveRules
+        if self.personinactiverule_set.count() > 0:
+            write_title('InactiveRules', line_length=60)
+
+            serializer.serialize(
+                self.personinactiverule_set.all().order_by('start'),
+                stream=buffer,
+            )
+
+            buffer.write('\n')
 
     class Meta:
         app_label = 'croesus_core'

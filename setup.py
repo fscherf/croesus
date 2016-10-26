@@ -18,5 +18,6 @@ setup(
         'Django>=1.8,<1.9',
         'python-dateutil',
         'PTable',
+        'pyyaml',
     ],
 )
