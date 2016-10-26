@@ -1,5 +1,5 @@
-croesus
--------
+Croesus
+=======
 
 .. image:: https://img.shields.io/travis/fscherf/croesus/master.svg
     :target: https://travis-ci.org/fscherf/croesus/
