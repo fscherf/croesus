@@ -1,0 +1,2 @@
+DONATION_ACCOUNT_NAME = 'Donations'
+MEMBERSHIPFEE_ACCOUNT_NAME = 'Membership Fees'
