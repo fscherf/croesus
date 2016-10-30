@@ -1,6 +1,20 @@
-from django.db.models import BooleanField, FloatField, Case, When, Sum, F
+from django.db.models import (
+    BooleanField,
+    FloatField,
+    Case,
+    When,
+    Max,
+    Min,
+    Sum,
+    F,
+)
+
 from django.apps import apps
 from django.db import models
+
+from ...utils.serializers import PrettyYamlSerializer
+from ...utils.buffers import write_title
+from ...utils.time import MONTH_NAMES
 
 __all__ = [
     'HibiscusTurnover',
@@ -11,6 +25,34 @@ class HibiscusTurnoverQuerySet(models.QuerySet):
     def match_ibans(self):
         for turnover in self.iterator():
             turnover.match_iban()
+
+    def dump(self, buffer, bookings=False):
+        dates = self.aggregate(Max('date'), Min('date'))
+        year_min = dates['date__min'].year
+        year_max = dates['date__max'].year
+        first_year_month_min = dates['date__min'].month
+        last_year_month_max = dates['date__max'].month
+
+        for index, year in enumerate(range(year_min, year_max + 1)):
+            month_min = 1
+            month_max = 12
+
+            if year == year_min:
+                month_min = first_year_month_min
+
+            if year == year_max:
+                month_max = last_year_month_max
+
+            for month in range(month_min, month_max + 1):
+                write_title(buffer, '{} {}'.format(year,
+                                                   MONTH_NAMES[month - 1]))
+
+                sub_qs = self.filter(date__year=year, date__month=month)
+
+                for turnover in sub_qs:
+                    turnover.dump(buffer)
+
+                    buffer.write('\n')
 
 
 class HibiscusTurnoverManager(models.Manager):
@@ -96,6 +138,11 @@ class HibiscusTurnover(models.Model):
         if pa.count() == 1:
             self.person = pa[0].person
             self.save()
+
+    def dump(self, buffer, bookings=False):
+        serializer = PrettyYamlSerializer()
+
+        serializer.serialize([self], stream=buffer)
 
     def __str__(self):
         return '<HibiscusTurnover:{}, {}, {}, {}>'.format(
