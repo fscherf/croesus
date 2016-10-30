@@ -4,6 +4,7 @@ from django.db.models import Case, When, Q, BooleanField
 from django.db import models
 
 from ...utils.serializers import PrettyYamlSerializer
+from ...utils.buffers import write_title
 
 from ...exceptions.membership_fee_agreement import (
     MultipleMembershipFeeAgreementsError,
@@ -108,21 +109,16 @@ class Person(models.Model):
         return None
 
     def dump(self, buffer):
-        def write_title(title, line_length=80):
-            buffer.write('# {} {}\n'.format(
-                title,
-                '#' * (line_length - len(title) - 4)))
-
         serializer = PrettyYamlSerializer()
 
         # Person
-        write_title(str(self))
+        write_title(buffer, str(self))
         serializer.serialize([self], stream=buffer)
         buffer.write('\n')
 
         # PersonAccounts
         if self.personaccount_set.count() > 0:
-            write_title('PersonAccounts', line_length=60)
+            write_title(buffer, 'PersonAccounts', line_length=60)
 
             serializer.serialize(
                 self.personaccount_set.all().order_by('iban'), stream=buffer)
@@ -131,7 +127,7 @@ class Person(models.Model):
 
         # MembershipFeeAgreements
         if self.membershipfeeagreement_set.count() > 0:
-            write_title('MembershipFeeAgreements', line_length=60)
+            write_title(buffer, 'MembershipFeeAgreements', line_length=60)
 
             serializer.serialize(
                 self.membershipfeeagreement_set.all().order_by('start'),
@@ -142,7 +138,7 @@ class Person(models.Model):
 
         # InactiveRules
         if self.personinactiverule_set.count() > 0:
-            write_title('InactiveRules', line_length=60)
+            write_title(buffer, 'InactiveRules', line_length=60)
 
             serializer.serialize(
                 self.personinactiverule_set.all().order_by('start'),
