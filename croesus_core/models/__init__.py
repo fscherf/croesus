@@ -18,7 +18,8 @@ def compact_ibans(sender, instance, **kwargs):
 
         valid, message = is_valid(instance.iban)
 
-        if not valid:
+        if not valid and sender is not HibiscusTurnover:  # NOQA
+            # FIXME: There are IBANs of the SPARKASSE without an country code
             raise ValueError(message)
 
 
