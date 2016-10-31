@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from ..utils.time import MONTH_NAMES
+
 
 class BooleanFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
@@ -41,28 +43,13 @@ class YearFilter(admin.SimpleListFilter):
 
 
 class MonthFilter(admin.SimpleListFilter):
-    MONTH_NAMES = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-    ]
-
     def lookups(self, request, model_admin):
         field = self.parameter_name.split('__')[0]
         dates = model_admin.get_queryset(request).dates(field, 'month')
         months = set(sorted([i.month for i in dates]))
 
         for month in months:
-            yield month, self.MONTH_NAMES[month - 1]
+            yield month, MONTH_NAMES[month - 1]
 
     def queryset(self, request, queryset):
         value = self.value()
