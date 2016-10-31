@@ -6,6 +6,7 @@ Install
 
 ::
 
+    $ cd test_project
     $ virtualenv -p python3.4 env
     $ source env/bin/activate
     (env) $ pip install -r REQUIREMENTS.txt
