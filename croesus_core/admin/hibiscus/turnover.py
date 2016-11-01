@@ -44,7 +44,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
 
     list_display = (
         'colored_amount',
-        'balance',
+        'colored_balance',
         'date',
         'person',
         'purpose',
@@ -71,6 +71,16 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         return mark_safe(template.format(color, obj.amount))
 
     colored_amount.short_description = 'Amount'
+
+    def colored_balance(self, obj):
+        if obj.balance >= 0:
+            return obj.balance
+
+        template = '<span style="color: red;">{:+.2f}</span>'
+
+        return mark_safe(template.format(obj.balance))
+
+    colored_balance.short_description = 'Balance'
 
     def bookings_amount(self, obj):
         return obj.bookings_amount or 0.0
