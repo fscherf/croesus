@@ -1,3 +1,4 @@
+from django.utils.html import mark_safe
 from django.contrib import admin
 
 from ..list_filter import BooleanFilter, YearFilter, MonthFilter
@@ -42,7 +43,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
     ]
 
     list_display = (
-        'amount',
+        'colored_amount',
         'balance',
         'date',
         'person',
@@ -62,6 +63,14 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         HibiscusTurnoverOverbookedFilter,
         'person',
     )
+
+    def colored_amount(self, obj):
+        template = '<span style="color: {};">{:+.2f}</span>'
+        color = 'limegreen' if obj.amount >= 0 else 'red'
+
+        return mark_safe(template.format(color, obj.amount))
+
+    colored_amount.short_description = 'Amount'
 
     def bookings_amount(self, obj):
         return obj.bookings_amount or 0.0
