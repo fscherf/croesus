@@ -20,14 +20,21 @@ class PersonForm(forms.ModelForm):
 
 
 class MembershipFeeAgreementForm(forms.ModelForm):
-    repayment_period_in_months = forms.FloatField(initial=1)
+    repayment_period_in_months = forms.FloatField(
+        label='Repayment Period In Months',
+        initial=1,
+    )
 
     currency = forms.ChoiceField(
+        label='Currency',
         choices=MEMBERSHIPFEEAGREEMENT_CURRENCY_CHOICES,
         initial=MEMBERSHIPFEEAGREEMENT_CURRENCY_CHOICES[0][0],
     )
 
-    fee = forms.FloatField(initial=20)
+    fee = forms.FloatField(
+        label='Fee',
+        initial=20,
+    )
 
     def __init__(self, *args, **kwargs):
         Person = apps.get_model('croesus_core.Person')
