@@ -77,6 +77,11 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
 
     bookings_amount.short_description = 'Bookings Amount'
 
+    def bookable(self, obj):
+        return obj.bookable
+
+    bookable.short_description = 'Bookable'
+
     def underbooked(self, obj):
         return obj.underbooked
 
@@ -94,6 +99,3 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
 
     overbooked.short_description = 'Overbooked'
     overbooked.boolean = True
-
-    def bookable(self, obj):
-        return obj.bookable
