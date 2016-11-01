@@ -35,6 +35,8 @@ class BookingInline(admin.TabularInline):
 
 
 class HibiscusTurnoverAdmin(admin.ModelAdmin):
+    ordering = ['-date']
+
     inlines = [
         BookingInline,
     ]
