@@ -1,7 +1,12 @@
 from django.contrib import admin
 
-from ...models import MembershipFeeAgreement, PersonInactiveRule
+from ...models import PersonAccount, MembershipFeeAgreement, PersonInactiveRule
 from ...forms import PersonForm, MembershipFeeAgreementForm
+
+
+class PersonAccountInline(admin.TabularInline):
+    model = PersonAccount
+    extra = 1
 
 
 class MembershipFeeAgreementInline(admin.TabularInline):
@@ -19,6 +24,7 @@ class PersonAdmin(admin.ModelAdmin):
     form = PersonForm
 
     inlines = [
+        PersonAccountInline,
         MembershipFeeAgreementInline,
         PersonInactiveRuleInline,
     ]
