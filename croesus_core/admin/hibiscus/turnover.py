@@ -46,6 +46,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         'balance',
         'date',
         'person',
+        'purpose',
         'bookings_amount',
         'bookable',
         'underbooked',
