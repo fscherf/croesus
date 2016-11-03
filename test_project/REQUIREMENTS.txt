@@ -1,3 +1,4 @@
 -e ..
 ipython
+django-debug-toolbar
 pyyaml
