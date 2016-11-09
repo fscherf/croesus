@@ -32,6 +32,28 @@ class HibiscusTurnoverMonthFilter(MonthFilter):
     parameter_name = 'date__month'
 
 
+class HibiscusTurnoverTypeFilter(admin.SimpleListFilter):
+    title = 'Type'
+    parameter_name = 'type'
+
+    def queryset(self, request, queryset):
+        value = self.value()
+
+        if value == 'r':
+            return queryset.filter(amount__gt=0)
+
+        if value == 'e':
+            return queryset.filter(amount__lt=0)
+
+        return queryset
+
+    def lookups(self, request, model_admin):
+        return (
+            ('r', 'Receipt',),
+            ('e', 'Expenditure',),
+        )
+
+
 class PersonTypeFilter(admin.SimpleListFilter):
     title = 'Person Type'
     parameter_name = 'person__type'
@@ -79,6 +101,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        HibiscusTurnoverTypeFilter,
         HibiscusTurnoverYearFilter,
         HibiscusTurnoverMonthFilter,
         HibiscusTurnoverUnderbookedFilter,
