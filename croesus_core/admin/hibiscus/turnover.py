@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.html import mark_safe
 from django.contrib import admin
+from django.apps import apps
 
 from ..list_filter import BooleanFilter, YearFilter, MonthFilter
 from ...models import Booking
@@ -29,6 +30,27 @@ class HibiscusTurnoverYearFilter(YearFilter):
 class HibiscusTurnoverMonthFilter(MonthFilter):
     title = 'Month'
     parameter_name = 'date__month'
+
+
+class PersonTypeFilter(admin.SimpleListFilter):
+    title = 'Person Type'
+    parameter_name = 'person__type'
+
+    def queryset(self, request, queryset):
+        value = self.value()
+
+        if not value:
+            return queryset
+
+        return queryset.filter(person__type=self.value())
+
+    def lookups(self, request, model_admin):
+        Person = apps.get_model('croesus_core', 'Person')
+
+        return (
+            (Person.MEMBER, 'Member',),
+            (Person.LEGAL_PERSON, 'Legal Person',),
+        )
 
 
 class BookingInline(admin.TabularInline):
@@ -62,6 +84,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         HibiscusTurnoverUnderbookedFilter,
         HibiscusTurnoverBookedFilter,
         HibiscusTurnoverOverbookedFilter,
+        PersonTypeFilter,
         'person',
     )
 
