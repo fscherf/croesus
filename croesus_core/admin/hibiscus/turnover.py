@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.utils.html import mark_safe
 from django.contrib import admin
 
@@ -46,7 +47,7 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         'colored_amount',
         'colored_balance',
         'date',
-        'person',
+        'person_link',
         'purpose',
         'bookings_amount',
         'bookable',
@@ -81,6 +82,17 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         return mark_safe(template.format(obj.balance))
 
     colored_balance.short_description = 'Balance'
+
+    def person_link(self, obj):
+        if not obj.person:
+            return ''
+
+        return mark_safe('<a href="{}">{}</a>'.format(
+            reverse('admin:croesus_core_person_change', args=[obj.person.pk]),
+            str(obj.person),
+        ))
+
+    person_link.short_description = 'Person'
 
     def bookings_amount(self, obj):
         return obj.bookings_amount or 0.0
