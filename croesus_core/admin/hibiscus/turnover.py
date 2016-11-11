@@ -100,6 +100,19 @@ class HibiscusTurnoverAdmin(admin.ModelAdmin):
         'overbooked',
     )
 
+    search_fields = (
+        'type',
+        'balance',
+        'amount',
+        'name',
+        'customer_ref',
+        'iban',
+        'bic',
+        'purpose',
+        'comment',
+        'commercial_transaction_code',
+    )
+
     list_filter = (
         HibiscusTurnoverTypeFilter,
         HibiscusTurnoverYearFilter,
