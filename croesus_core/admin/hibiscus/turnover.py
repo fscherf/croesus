@@ -81,6 +81,7 @@ class BookingInline(admin.TabularInline):
 
 
 class HibiscusTurnoverAdmin(admin.ModelAdmin):
+    change_list_template = 'croesus_core/admin/hibiscus/turnover/change_list.html'  # NOQA
     ordering = ['-date']
 
     inlines = [
