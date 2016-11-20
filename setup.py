@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'Django>=1.8,<1.9',
         'python-dateutil',
+        'mt-940==4.2',
         'PTable',
         'pyyaml',
     ],
