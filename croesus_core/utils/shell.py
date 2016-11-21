@@ -1,5 +1,9 @@
 from prettytable import PrettyTable
 from django.core.exceptions import FieldDoesNotExist
+import tempfile
+from subprocess import call
+from django.template.loader import render_to_string
+import os
 
 TABLE_RIGHT_ALIGNED_FIELDS = (
     'AutoField',
@@ -159,3 +163,20 @@ def queryset_to_prettytable(queryset, field_names=None, numbered=False):
         table.add_row(row)
 
     return table
+
+
+def shell_filter(qs):
+    editor = os.environ.get('EDITOR', 'vim')
+    pks = []
+
+    with tempfile.NamedTemporaryFile(mode='w+', suffix='.tmp') as tf:
+        tf.write(render_to_string('croesus_core/shell/filter.txt', {'qs': qs}))
+        tf.flush()
+        call([editor, tf.name])
+        tf.seek(0)
+
+        for line in tf.readlines():
+            if line and not line.startswith('#') and ':' in line:
+                pks.append(line.split(':')[0])
+
+    return qs.filter(pk__in=pks)

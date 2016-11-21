@@ -1,0 +1,4 @@
+# Format: $PK: $OBJECT_REPRESENTATION
+# Lines beginning with '#' are getting ignored
+{% for obj in qs %}
+{{ obj.pk }}: {{ obj }}{% endfor %}
