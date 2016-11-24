@@ -1,5 +1,0 @@
--e ..
-ipython
-django-debug-toolbar
-django-extensions
-pyyaml
