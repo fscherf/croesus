@@ -2,48 +2,20 @@ from django.test import TestCase
 
 
 class ModelTestCase(TestCase):
-    def test_hibiscus_turnover_unique(self):
-        from django.db.utils import IntegrityError
-
-        from croesus_core.models import HibiscusTurnover
-
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=1,
-            amount=20.0,
-        )
-
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=2,
-            amount=20.0,
-        )
-
-        with self.assertRaises(IntegrityError):
-            HibiscusTurnover.objects.create(
-                account_id=1,
-                turnover_id=2,
-                amount=20.0,
-            )
-
-    def test_hibiscus_turnover_delete(self):
+    def test_transaction_delete(self):
         from django.db.models import ProtectedError
 
-        from croesus_core.models import HibiscusTurnover, Account
+        from croesus_core.models import Transaction, Account
 
-        # turnover without bookings
-        t1 = HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=1,
+        # transaction without bookings
+        t1 = Transaction.objects.create(
             amount=20.0,
         )
 
         t1.delete()
 
-        # turnover with bookings
-        t2 = HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=2,
+        # transaction with bookings
+        t2 = Transaction.objects.create(
             amount=20.0,
         )
 

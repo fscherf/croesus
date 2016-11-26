@@ -14,8 +14,8 @@ class Booking(models.Model):
         on_delete=models.PROTECT,
     )
 
-    turnover = models.ForeignKey(
-        'croesus_core.HibiscusTurnover',
+    transaction = models.ForeignKey(
+        'croesus_core.Transaction',
         related_name='bookings',
         on_delete=models.PROTECT,
         blank=True,

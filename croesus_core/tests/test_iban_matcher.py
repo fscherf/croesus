@@ -4,7 +4,7 @@ from django.test import TestCase
 class IBANMatcherTestCase(TestCase):
     def test_iban_matcher(self):
         from croesus_core.models import (
-            HibiscusTurnover,
+            Transaction,
             PersonAccount,
             Person,
         )
@@ -30,74 +30,65 @@ class IBANMatcherTestCase(TestCase):
             iban='DE12123412341234123402',
         )
 
-        # alice turnovers
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=1,
-            iban='DE12123412341234123400',
-        )
+        # alice transactions
+        transactions_alice = [
+            Transaction.objects.create(
+                iban='DE12123412341234123400',
+            ).pk,
+            Transaction.objects.create(
+                iban='DE12123412341234123400',
+            ).pk,
+        ]
 
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=2,
-            iban='DE12123412341234123400',
-        )
+        # bobs transactions
+        transactions_bob = [
+            Transaction.objects.create(
+                iban='DE12123412341234123401',
+            ).pk,
+            Transaction.objects.create(
+                iban='DE12123412341234123402',
+            ).pk,
+        ]
 
-        # bobs turnovers
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=3,
-            iban='DE12123412341234123401',
-        )
-
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=4,
-            iban='DE12123412341234123402',
-        )
-
-        # unrelated turnover
-        HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=5,
+        # unrelated transaction
+        Transaction.objects.create(
             iban='DE12123412341234123403',
         )
 
         # run matcher
-        HibiscusTurnover.objects.all().match_ibans()
+        Transaction.objects.all().match_ibans()
 
         # run checks
         # alice
         self.assertEqual(
-            alice.hibiscusturnover_set.count(),
+            alice.transaction_set.count(),
             2,
         )
 
         self.assertEqual(
-            alice.hibiscusturnover_set.filter(
-                turnover_id__in=[1, 2],
+            alice.transaction_set.filter(
+                pk__in=transactions_alice,
             ).count(),
             2,
         )
 
         # bob
         self.assertEqual(
-            bob.hibiscusturnover_set.count(),
+            bob.transaction_set.count(),
             2,
         )
 
         self.assertEqual(
-            bob.hibiscusturnover_set.filter(
-                turnover_id__in=[3, 4],
+            bob.transaction_set.filter(
+                pk__in=transactions_bob,
             ).count(),
             2,
         )
 
         # unrelated
         self.assertTrue(
-            HibiscusTurnover.objects.filter(
-                account_id=1,
-                turnover_id=5,
+            Transaction.objects.filter(
+                iban='DE12123412341234123403',
                 person__isnull=True,
             ).exists()
         )

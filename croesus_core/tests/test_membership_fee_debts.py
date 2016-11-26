@@ -61,7 +61,7 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
     def test_debt_bookings(self):
         from croesus_core.models import (
             MembershipFeeDebt,
-            HibiscusTurnover,
+            Transaction,
             Account,
             Person,
         )
@@ -78,9 +78,7 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
 
         account = Account.objects.create(name='Account')
 
-        turnover = HibiscusTurnover.objects.create(
-            account_id=1,
-            turnover_id=1,
+        transaction = Transaction.objects.create(
             amount=200.0,
         )
 
@@ -134,7 +132,7 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
         )
 
         # test unpaid
-        debt.bookings.add(turnover.book(account, 10.0))
+        debt.bookings.add(transaction.book(account, 10.0))
         debt.save()
 
         self.assertEqual(
@@ -186,7 +184,7 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
         )
 
         # test paid
-        debt.bookings.add(turnover.book(account, 10.0))
+        debt.bookings.add(transaction.book(account, 10.0))
         debt.save()
 
         self.assertEqual(
@@ -238,8 +236,8 @@ class MembershipFeeDebtTestCase(TransactionTestCase):
         )
 
         # test overpaid
-        debt.bookings.add(turnover.book(account, 5.50))
-        debt.bookings.add(turnover.book(account, 4.50))
+        debt.bookings.add(transaction.book(account, 5.50))
+        debt.bookings.add(transaction.book(account, 4.50))
         debt.save()
 
         self.assertEqual(
