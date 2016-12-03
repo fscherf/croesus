@@ -1,7 +1,7 @@
 from collections import Iterable
 
 from django.db.models import BooleanField, Case, When, Sum, F
-from django.db import transaction
+from django.db import transaction as db_transaction
 from django.apps import apps
 from django.db import models
 
@@ -44,7 +44,7 @@ class MembershipFeeDebtManager(models.Manager):
             ),
         )
 
-    @transaction.atomic
+    @db_transaction.atomic
     def create_for(self, periods, persons=None):
         Person = apps.get_model('croesus_core', 'Person')
 
@@ -96,6 +96,30 @@ class MembershipFeeDebt(models.Model):
     bookings = models.ManyToManyField('croesus_core.Booking')
 
     comment = models.TextField(blank=True, null=True, verbose_name='Comment')
+
+    @db_transaction.atomic
+    def pay(self, model_object):
+        Transaction = apps.get_model('croesus_core', 'Transaction')
+        Account = apps.get_model('croesus_core', 'Account')
+        Booking = apps.get_model('croesus_core', 'Booking')
+
+        if not type(model_object) in (Transaction, Booking):
+            raise ValueError  # FIXME
+
+        if type(model_object) == Transaction:
+            booking = model_object.book(
+                account=Account.objects.get_membership_fee_account(),
+                amount=self.fee,
+                date=self.period,
+            )
+
+        else:
+            booking = model_object
+
+        self.bookings.add(booking)
+        self.save()
+
+        return booking
 
     def __str__(self):
         return '<MembershipFeeDebt {}, {}, {}>'.format(self.person, self.period, self.fee)  # NOQA
