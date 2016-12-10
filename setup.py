@@ -19,6 +19,7 @@ setup(
         'mt-940==4.2',
         'PTable',
         'pyyaml',
+        'IPython',
     ],
     classifiers=[
         'Operating System :: OS Independent',

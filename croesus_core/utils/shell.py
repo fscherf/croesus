@@ -4,6 +4,8 @@ import tempfile
 from subprocess import call
 from django.template.loader import render_to_string
 import os
+from IPython import embed
+from django.apps import apps
 
 TABLE_RIGHT_ALIGNED_FIELDS = (
     'AutoField',
@@ -180,3 +182,36 @@ def shell_filter(qs):
                 pks.append(line.split(':')[0])
 
     return qs.filter(pk__in=pks)
+
+
+def choose_interactive(_model_names):
+    class Context:
+        def __init__(self, models):
+            self._choosen = None
+            self.kill = False
+            self._classes = []
+            self._names = []
+
+            for model in models:
+                model_class = apps.get_model(*model)
+                model_name = model[1]
+
+                self._names.append(model_name)
+                self._classes.append(model_class)
+
+                setattr(self, model_name, model_class)
+
+        def choose(self, model):
+            self._choosen = model
+
+    c = Context(_model_names)
+    _header = 'Choose from [{}] with c.choose()'.format(', '.join(c._names))
+
+    while True:
+        embed(header=_header)
+
+        if type(c._choosen) in c._classes:
+            return c._choosen
+
+        if c.kill:
+            return False
