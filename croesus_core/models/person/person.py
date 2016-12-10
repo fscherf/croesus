@@ -5,6 +5,7 @@ from django.db import models
 
 from ...utils.serializers import PrettyYamlSerializer
 from ...utils.buffers import write_title
+from ..base import CroesusQueryset
 
 from ...exceptions.membership_fee_agreement import (
     MultipleMembershipFeeAgreementsError,
@@ -15,7 +16,17 @@ __all__ = [
 ]
 
 
-class PersonQuerySet(models.QuerySet):
+class PersonQuerySet(CroesusQueryset):
+    PRETTYTABLE_FIELDS = [
+        'pk',
+        'type',
+        'name',
+        'surname',
+        'nickname',
+        'email_address',
+        'accession',
+    ]
+
     def dump(self, buffer):
         for index, person in enumerate(self.order_by('surname', 'name')):
             if index > 0:

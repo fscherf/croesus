@@ -1,4 +1,4 @@
-from prettytable import PrettyTable
+from prettytable import PrettyTable, ALL, NONE
 from django.core.exceptions import FieldDoesNotExist
 import tempfile
 from subprocess import call
@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 import os
 from IPython import embed
 from django.apps import apps
+from functools import reduce
 
 TABLE_RIGHT_ALIGNED_FIELDS = (
     'AutoField',
@@ -150,7 +151,22 @@ def confirmation_prompt(text, default=None, no_color=False):
         raise
 
 
-def queryset_to_prettytable(queryset, field_names=None, numbered=False):
+def wrap(text, width):
+    """
+    A word-wrap function that preserves existing line breaks
+    and most spaces in the text. Expects that existing line
+    breaks are posix newlines (\n).
+    """
+
+    return reduce(lambda line, word, width=width: '%s%s%s' %
+                  (line,
+                   ' \n'[(len(line)-line.rfind('\n') - 1
+                         + len(word.split('\n', 1)[0]) >= width)], word),
+                  text.split(' '))
+
+
+def queryset_to_prettytable(queryset, field_names=None, numbered=True,
+                            number_offset=0):
     if not field_names:
         field_names = [i.name for i in queryset.model._meta.fields]
 
@@ -164,6 +180,9 @@ def queryset_to_prettytable(queryset, field_names=None, numbered=False):
         table.field_names = field_names
 
     table.align = 'l'
+    table.vrules = NONE
+    table.hrules = ALL
+    table.horizontal_char = '─'
 
     for field_name in field_names:
         try:
@@ -179,10 +198,15 @@ def queryset_to_prettytable(queryset, field_names=None, numbered=False):
         row = []
 
         for field_name in field_names:
-            row.append(getattr(obj, field_name, '') or '')
+            attr = getattr(obj, field_name, '') or ''
+
+            if type(attr) == str:
+                attr = wrap(attr, width=25)
+
+            row.append(attr)
 
         if numbered:
-            row = [index + 1] + row
+            row = [index + number_offset] + row
 
         table.add_row(row)
 

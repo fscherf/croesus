@@ -1,3 +1,4 @@
+from prettytable import PrettyTable, ALL, NONE
 from collections import Iterable
 
 from django.db.models import BooleanField, Case, When, Sum, F
@@ -9,13 +10,56 @@ from ...exceptions.membership_fee_debt import (
     MultipleMembershipFeeDebtsError,
 )
 
+from ..base import CroesusQueryset
+
 __all__ = [
     'MembershipFeeDebt',
 ]
 
 
-class MembershipFeeDebtQuerySet(models.QuerySet):
-    pass
+class MembershipFeeDebtQuerySet(CroesusQueryset):
+    def to_prettytable(self, field_names=None, numbered=True,
+                       number_offset=0):
+
+        table = PrettyTable()
+        field_names = ['Person', 'Period', 'Fee', 'Agreement', 'Unpaid',
+                       'Paid', 'Overpaid', 'Comment']
+
+        if numbered:
+            field_names = ['#'] + field_names
+
+        table.field_names = field_names
+        table.align = 'l'
+        table.vrules = NONE
+        table.hrules = ALL
+        table.horizontal_char = '─'
+
+        if numbered:
+            table.align['#'] = 'r'
+
+        table.align['Fee'] = 'r'
+        table.align['Unpaid'] = 'r'
+        table.align['Paid'] = 'r'
+        table.align['Overpaid'] = 'r'
+
+        for index, debt in enumerate(self.iterator()):
+            row = [
+                debt.person,
+                debt.period,
+                debt.fee,
+                debt.agreement,
+                'x' if debt.unpaid else '',
+                'x' if debt.paid else '',
+                'x' if debt.overpaid else '',
+                debt.comment or '',
+            ]
+
+            if numbered:
+                row.insert(0, index + number_offset)
+
+            table.add_row(row)
+
+        return table
 
 
 class MembershipFeeDebtManager(models.Manager):

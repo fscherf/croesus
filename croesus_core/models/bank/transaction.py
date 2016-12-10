@@ -3,13 +3,24 @@ from django.db import models, transaction as db_transaction
 from django.apps import apps
 
 from ...utils.mt940 import parse_mt940, parse_mt940_transaction_details
+from ..base import CroesusQueryset
 
 __all__ = [
     'Transaction',
 ]
 
 
-class TransactionQuerySet(models.QuerySet):
+class TransactionQuerySet(CroesusQueryset):
+    PRETTYTABLE_FIELDS = [
+        'pk',
+        'amount',
+        'date',
+        'person',
+        'purpose',
+        'bookings_amount',
+        'bookable',
+    ]
+
     def match_ibans(self):
         for transaction in self.iterator():
             transaction.match_iban()
