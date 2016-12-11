@@ -150,6 +150,26 @@ class Transaction(models.Model):
     # additional data
     comment = models.TextField(blank=True, null=True)
 
+    def get_bookings_amount(self):
+        return self.bookings.aggregate(Sum('amount'))['amount__sum'] or 0.0
+
+    def get_bookable(self):
+        bookings_amount = self.get_bookings_amount()
+
+        if bookings_amount >= self.amount:
+            return 0.0
+
+        return self.amount - self.get_bookings_amount()
+
+    def is_underbooked(self):
+        return self.get_bookings_amount() < self.amount
+
+    def is_booked(self):
+        return self.get_bookings_amount() >= self.amount
+
+    def is_overbooked(self):
+        return self.get_bookings_amount() > self.amount
+
     def parse_details(self, save=True):
         details = parse_mt940_transaction_details(self.details,
                                                   bank_code=self.bank_code)
@@ -174,11 +194,21 @@ class Transaction(models.Model):
             if save:
                 self.save()
 
-    def book(self, account, amount=None):
+    def book(self, account, amount=None, date=None):
         Booking = apps.get_model('croesus_core', 'Booking')
 
         return Booking.objects.create(
             transaction=self,
             account=account,
-            amount=amount or self.amount,
+            amount=amount or self.get_bookable(),
+            date=date,
+        )
+
+    def donate(self, amount=None, date=None):
+        Account = apps.get_model('croesus_core', 'Account')
+
+        return self.book(
+            account=Account.objects.get_donation_account(),
+            amount=amount,
+            date=date,
         )

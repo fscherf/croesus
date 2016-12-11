@@ -45,6 +45,8 @@ class BookingTestCase(TestCase):
         )
 
     def test_booking_amounts(self):
+        # FIXME: remove Transaction.objects.first() from tests
+
         from croesus_core.models import Transaction, Account
 
         # create account
@@ -56,6 +58,14 @@ class BookingTestCase(TestCase):
         )
 
         # test underbooked on empty bookings
+        # api
+        self.assertEqual(transaction.get_bookings_amount(), 0.0)
+        self.assertEqual(transaction.get_bookable(), 20.0)
+        self.assertEqual(transaction.is_underbooked(), True)
+        self.assertEqual(transaction.is_booked(), False)
+        self.assertEqual(transaction.is_overbooked(), False)
+
+        # annatations
         self.assertEqual(
             Transaction.objects.count(), 1)
 
@@ -107,6 +117,14 @@ class BookingTestCase(TestCase):
         # test underbooked
         transaction.book(account, 5.0)
 
+        # api
+        self.assertEqual(transaction.get_bookings_amount(), 5.0)
+        self.assertEqual(transaction.get_bookable(), 15.0)
+        self.assertEqual(transaction.is_underbooked(), True)
+        self.assertEqual(transaction.is_booked(), False)
+        self.assertEqual(transaction.is_overbooked(), False)
+
+        # annatations
         self.assertEqual(
             Transaction.objects.count(), 1)
 
@@ -158,6 +176,14 @@ class BookingTestCase(TestCase):
         # test booked
         transaction.book(account, 15.0)
 
+        # api
+        self.assertEqual(transaction.get_bookings_amount(), 20.0)
+        self.assertEqual(transaction.get_bookable(), 0.0)
+        self.assertEqual(transaction.is_underbooked(), False)
+        self.assertEqual(transaction.is_booked(), True)
+        self.assertEqual(transaction.is_overbooked(), False)
+
+        # annatations
         self.assertEqual(
             Transaction.objects.count(), 1)
 
@@ -210,6 +236,14 @@ class BookingTestCase(TestCase):
         transaction.book(account, 6.50)
         transaction.book(account, 3.50)
 
+        # api
+        self.assertEqual(transaction.get_bookings_amount(), 30.0)
+        self.assertEqual(transaction.get_bookable(), 0.0)
+        self.assertEqual(transaction.is_underbooked(), False)
+        self.assertEqual(transaction.is_booked(), True)
+        self.assertEqual(transaction.is_overbooked(), True)
+
+        # annatations
         self.assertEqual(
             Transaction.objects.count(), 1)
 
