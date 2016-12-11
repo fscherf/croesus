@@ -73,9 +73,10 @@ class Booking(models.Model):
     booked = models.DateField(auto_now_add=True, editable=False, null=True,
                               blank=True)
 
+    def __str__(self):
+        return 'pk={}, amount={}, date={}, account={}'.format(
+            self.pk, self.amount, self.date, self.account)
+
     class Meta:
         app_label = 'croesus_core'
         ordering = ['date']
-
-    def __str__(self):
-        return '{}, {}, {}'.format(self.pk, self.amount, self.account)

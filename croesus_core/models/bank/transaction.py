@@ -212,3 +212,7 @@ class Transaction(models.Model):
             amount=amount,
             date=date,
         )
+
+    def __str__(self):
+        return 'pk={}, date={}, person={}, amount={}'.format(
+            self.pk, self.date, self.person or self.name, self.amount)

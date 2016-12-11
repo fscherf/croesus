@@ -166,7 +166,8 @@ class MembershipFeeDebt(models.Model):
         return booking
 
     def __str__(self):
-        return '<MembershipFeeDebt {}, {}, {}>'.format(self.person, self.period, self.fee)  # NOQA
+        return 'pk={}, person={}, period={}, fee={}'.format(
+            self.pk, self.person, self.period, self.fee)
 
     class Meta:
         app_label = 'croesus_core'
