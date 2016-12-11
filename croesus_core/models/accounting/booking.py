@@ -7,7 +7,7 @@ __all__ = [
 
 class Booking(models.Model):
     amount = models.FloatField(verbose_name='Amount')
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(blank=True, null=True)
 
     account = models.ForeignKey(
         'croesus_core.Account',
@@ -23,11 +23,12 @@ class Booking(models.Model):
     )
 
     comment = models.TextField(blank=True, null=True, verbose_name='Comment')
+    booked = models.DateField(auto_now_add=True, editable=False, null=True,
+                              blank=True)
 
     class Meta:
         app_label = 'croesus_core'
         ordering = ['date']
 
     def __str__(self):
-        return '<Booking:{}, {}, {}>'.format(self.pk, self.amount,
-                                             self.account)
+        return '{}, {}, {}'.format(self.pk, self.amount, self.account)
