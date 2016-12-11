@@ -46,14 +46,36 @@ def blue(text):
     return '\033[1;34m{}\033[1;m'.format(text)
 
 
-def option_prompt(text, options, default=None, no_color=False):
-    ps = '{} [{}] '.format(text, '/'.join(list(options)))
+def magenta(text):
+    return '\033[1;36m{}\033[1;m'.format(text)
+
+
+def option_prompt(text, options, option_range=None, default=None,
+                  no_color=False):
+    ps = '{} [{}]'.format(text, '/'.join(list(options)))
+
+    if option_range:
+        ps += '/[{}..{}]'.format(option_range.start, option_range.stop - 1)
+
+    ps += ' '
 
     try:
         while True:
             user_input = input(ps)
 
             if user_input:
+                # int
+                if option_range:
+                    try:
+                        int_user_input = int(user_input)
+
+                        if int_user_input in option_range:
+                            return int_user_input
+
+                    except ValueError:
+                        pass
+
+                # str
                 user_input = user_input[0]
 
             if user_input and user_input in options:
@@ -65,7 +87,7 @@ def option_prompt(text, options, default=None, no_color=False):
             if not no_color:
                 ps = red(ps)
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         print()
 
         raise
