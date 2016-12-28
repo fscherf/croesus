@@ -1,0 +1,14 @@
+{% load croesus_report_filter %}{{Finanzbericht_v2
+|Datum={{ month|mediawiki_month }} {{ year }}
+|Geplante Beiträge = {{ membershipfees_expected|mediawiki_number }}
+|Gezahlte Beiträge = {{ membershipfees_paid|mediawiki_number }}
+|Aktive Mitglieder = {{ active_members }}
+|Zahlende Mitglieder = {{ paying_members }}
+|Kontostand = {{ balance|mediawiki_number }}
+|Kontostand real = {{ real_balance|mediawiki_number }}
+|Spenden = {{ donations|mediawiki_number }}
+|Ausgaben = {{ expenditures|mediawiki_number }}
+|Mitglieder im Rückstand = {{ members_behind }}
+|Abrechnungsdatum = {{ date_of_report|strftime:"%Y/%m/%d %H:%M:%S" }}
+|BerichtKommentar =
+}}
