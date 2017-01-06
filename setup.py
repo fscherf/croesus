@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='croesus',
-    version='0.1',
+    version='0.2',
     description='',
     url='https://github.com/fscherf/croesus',
     author='Florian Scherf',
